@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING
 from ..utils import logging
 from ..utils.import_utils import is_torch_available, is_torch_distributed_available
 from .parallel_utils import _use_local_dtensor_params
-from .tensor_parallel import ALL_PARALLEL_STYLES, TensorParallelLayer
+from .tensor_parallel import ALL_PARALLEL_STYLES
 
 
 if TYPE_CHECKING:
@@ -82,7 +82,7 @@ class ExpertParallelLayer:
         return module
 
 
-class MoeExpertsParallel(TensorParallelLayer):
+class MoeExpertsParallel(ExpertParallelLayer):
     def should_use_local_tensors(self, module):
         return True
 
@@ -141,7 +141,7 @@ class MoeExpertsParallel(TensorParallelLayer):
         return _AllReduceForward.apply(output, process_group)
 
 
-class MoeIdentityParallel(TensorParallelLayer):
+class MoeIdentityParallel(ExpertParallelLayer):
     """
     Used in longcat_flash zero_experts (nn.Identity) which return the same value on every GPU, but the
     moe_tp_experts will sums across GPUs. Therefore we pre-divide the identity input by tp_size to cancel the extra scaling.
